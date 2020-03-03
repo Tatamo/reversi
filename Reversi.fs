@@ -78,6 +78,25 @@ let place color (x, y) (board: Board) =
     Array2D.set newBoard x y (Some color)
     newBoard
 
+let formatBoard (board: Board) =
+    let charArray2D =
+        board
+        |> Array2D.map (fun disk ->
+            match disk with
+            | Some(color) ->
+                match color with
+                | Black -> 'x'
+                | White -> 'o'
+            | None -> '.')
+    seq {
+        for x in 0 .. 7 do
+            yield seq {
+                      for y in 0 .. 7 -> charArray2D.[x, y]
+                  }
+                  |> Seq.toArray
+                  |> System.String
+    } |> Seq.fold (fun acc elm -> acc + "\n" + elm) ""
+
 type GameStatus =
     | InGame of Color
     | GameEnd of Color
