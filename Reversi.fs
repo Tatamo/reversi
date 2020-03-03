@@ -33,28 +33,28 @@ let directions =
 let isInBoard (x, y) = x >= 0 && x < 8 && y >= 0 && y < 8
 
 /// pick up disks, starting from (x,y) and go to the specified direction toward the end of board
-let rec extractLine (board: Board) (x, y) dir =
+let rec extractLine (x, y) dir (board: Board) =
     if isInBoard (x, y) then
         match dir with
-        | (dx, dy) -> board.[x, y] :: extractLine board (x + dx, y + dy) dir
+        | (dx, dy) -> board.[x, y] :: extractLine (x + dx, y + dy) dir board
     else
         []
 
-let rec _checkFlippableLine disks color =
+let rec _checkFlippableLine color disks =
     match disks with
     | Some(c) :: remains ->
-        if c = color then true else _checkFlippableLine remains color
+        if c = color then true else _checkFlippableLine color remains
     | None :: remains -> false
     | [] -> false
 
-let checkFlippableLine disks color =
+let checkFlippableLine color disks =
     match disks with
     | Some(c) :: remains ->
-        if c = color then false else _checkFlippableLine remains color
+        if c = color then false else _checkFlippableLine color remains
     | None :: remains -> false
     | [] -> false
 
-let checkPlacable (board: Board) color (x, y) =
+let checkPlacable color (x, y) (board: Board) =
     if not (isInBoard (x, y)) then
         false
     else
@@ -62,13 +62,14 @@ let checkPlacable (board: Board) color (x, y) =
         | Some(_) -> false
         | None ->
             directions
-            |> Seq.exists (fun (dx, dy) -> checkFlippableLine (extractLine board (x + dx, y + dy) (dx, dy)) color)
+            |> Seq.exists (fun (dx, dy) -> checkFlippableLine color (extractLine (x + dx, y + dy) (dx, dy) board))
 
-let place (board: Board) color (x, y) =
+let place color (x, y) (board: Board) =
     let newBoard = Array2D.copy board
-    directions |> Seq.toList
-    |> List.map (fun (dx, dy) -> (dx, dy), extractLine board (x + dx, y + dy) (dx, dy))
-    |> List.filter (fun (dir, line) -> checkFlippableLine line color)
+    directions
+    |> Seq.toList
+    |> List.map (fun (dx, dy) -> (dx, dy), extractLine (x + dx, y + dy) (dx, dy) board)
+    |> List.filter (fun (dir, line) -> checkFlippableLine color line)
     |> List.map (fun ((dx, dy), line) ->
         let flipLength = (Seq.findIndex (fun disk -> disk = Some(color))) line
         for distance in 1 .. flipLength do

@@ -5,11 +5,11 @@ open Reversi
 
 [<EntryPoint>]
 let main argv =
-  printfn "%A" (seq {for x in 0..7 do for y in 1..7 do yield (x,y)} |> Seq.filter (fun pos -> checkPlacable initBoard Black pos))
-  printfn "%b" (checkPlacable initBoard Black (1, 1))
-  printfn "%b" (checkPlacable initBoard Black (2, 3))
-  printfn "%b" (checkPlacable initBoard Black (3, 2))
-  printfn "%b" (checkPlacable initBoard Black (3, 3))
-  printfn "%A" (place initBoard Black (2,3))
-  printfn "%A" (place (place initBoard Black (2,3)) White (2, 2))
+  printfn "%A" (seq {for x in 0..7 do for y in 1..7 do yield (x,y)} |> Seq.filter (fun pos -> checkPlacable Black pos initBoard))
+  printfn "%b" (checkPlacable Black (1, 1) initBoard)
+  printfn "%b" (checkPlacable Black (2, 3) initBoard)
+  printfn "%b" (checkPlacable Black (3, 2) initBoard)
+  printfn "%b" (checkPlacable Black (3, 3) initBoard)
+  printfn "%A" (initBoard |> place Black (2, 3))
+  printfn "%A" (initBoard |> place Black (2,3) |> place White (2, 2))
   0 // return an integer exit code
