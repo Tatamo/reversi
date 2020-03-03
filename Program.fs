@@ -10,4 +10,6 @@ let main argv =
   printfn "%b" (checkPlacable initBoard Black (2, 3))
   printfn "%b" (checkPlacable initBoard Black (3, 2))
   printfn "%b" (checkPlacable initBoard Black (3, 3))
+  printfn "%A" (place initBoard Black (2,3))
+  printfn "%A" (place (place initBoard Black (2,3)) White (2, 2))
   0 // return an integer exit code
