@@ -112,3 +112,13 @@ type Game = Board * GameStatus
 let initGame: Game = initBoard, InGame Black
 
 let formatGame (board, status) = formatBoard board + "\n" + formatGameStatus status
+
+let play (x, y) game =
+    match game with
+    | _, GameEnd(_) -> game
+    | board, InGame(color) ->
+        if checkPlacable color (x, y) board then
+            let nextBoard = place color (x, y) board
+            nextBoard, InGame(swap color)
+        else
+            game

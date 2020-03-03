@@ -12,4 +12,5 @@ let main argv =
   printfn "%b" (checkPlacable Black (3, 3) initBoard)
   printfn "%s" (initBoard |> place Black (2, 3) |> formatBoard)
   printfn "%s" (initBoard |> place Black (2, 3) |> place White (2, 2) |> formatBoard)
+  printfn "%s" (initGame |> play (2, 3) |> play(2, 2) |> formatGame)
   0 // return an integer exit code
