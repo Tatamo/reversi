@@ -95,12 +95,20 @@ let formatBoard (board: Board) =
                   }
                   |> Seq.toArray
                   |> System.String
-    } |> Seq.fold (fun acc elm -> acc + "\n" + elm) ""
+    }
+    |> Seq.fold (fun acc elm -> acc + "\n" + elm) ""
 
 type GameStatus =
     | InGame of Color
     | GameEnd of Color
 
+let formatGameStatus gameStatus =
+    match gameStatus with
+    | InGame(color) -> sprintf "%s's turn" (color.ToString())
+    | GameEnd(color) -> sprintf "Winner: %s" (color.ToString())
+
 type Game = Board * GameStatus
 
 let initGame: Game = initBoard, InGame Black
+
+let formatGame (board, status) = formatBoard board + "\n" + formatGameStatus status
