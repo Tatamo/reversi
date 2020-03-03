@@ -67,10 +67,9 @@ let checkPlacable color (x, y) (board: Board) =
 let place color (x, y) (board: Board) =
     let newBoard = Array2D.copy board
     directions
-    |> Seq.toList
-    |> List.map (fun (dx, dy) -> (dx, dy), extractLine (x + dx, y + dy) (dx, dy) board)
-    |> List.filter (fun (dir, line) -> checkFlippableLine color line)
-    |> List.map (fun ((dx, dy), line) ->
+    |> Seq.map (fun (dx, dy) -> (dx, dy), extractLine (x + dx, y + dy) (dx, dy) board)
+    |> Seq.filter (fun (dir, line) -> checkFlippableLine color line)
+    |> Seq.iter (fun ((dx, dy), line) ->
         let flipLength = (Seq.findIndex (fun disk -> disk = Some(color))) line
         for distance in 1 .. flipLength do
             Array2D.set newBoard (x + dx * distance) (y + dy * distance) (Some color))
