@@ -44,14 +44,14 @@ let rec _checkFlippableLine color disks =
     match disks with
     | Some(c) :: remains ->
         if c = color then true else _checkFlippableLine color remains
-    | None :: remains -> false
+    | None :: _ -> false
     | [] -> false
 
 let checkFlippableLine color disks =
     match disks with
     | Some(c) :: remains ->
         if c = color then false else _checkFlippableLine color remains
-    | None :: remains -> false
+    | None :: _ -> false
     | [] -> false
 
 let checkPlacable color (x, y) (board: Board) =
