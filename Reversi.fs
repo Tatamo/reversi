@@ -88,9 +88,9 @@ let formatBoard (board: Board) =
              | White -> 'o'
          | None -> '.')
   seq {
-    for x in 0 .. 7 do
+    for y in 0 .. 7 do
       yield seq {
-              for y in 0 .. 7 -> charArray2D.[x, y]
+              for x in 0 .. 7 -> charArray2D.[x, y]
             }
             |> Seq.toArray
             |> System.String
