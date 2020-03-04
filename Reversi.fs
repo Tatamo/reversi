@@ -79,6 +79,22 @@ let findPlacable color board =
   }
   |> Seq.filter (fun pos -> checkPlacable color pos board)
 
+let count color (board: Board) =
+  seq {
+    for x in 0 .. 7 do
+      for y in 0 .. 7 do
+        yield board.[x, y]
+  }
+  |> Seq.filter (fun disk -> disk = Some(color))
+  |> Seq.length
+
+let getWinner board =
+  let countBlack = count Black board
+  let countWhite = count White board
+  if countBlack = countWhite then None
+  else if countBlack > countWhite then Some(Black)
+  else Some(White)
+
 let place color (x, y) (board: Board) =
   let newBoard = Array2D.copy board
   directions
@@ -111,7 +127,7 @@ let formatBoard (board: Board) =
 
 type GameStatus =
   | InGame of Color
-  | GameEnd of Color
+  | GameEnd of Color option
 
 let formatGameStatus gameStatus =
   match gameStatus with
@@ -125,7 +141,7 @@ let formatGame (board, status) = formatBoard board + "\n" + formatGameStatus sta
 
 type FinalTurnResult =
   { hand: Pos * Color
-    win: Color }
+    win: Color option }
 
 type SuccessTurnResult =
   { hand: Pos * Color
@@ -156,12 +172,21 @@ let play (x, y) game =
       if checkPlacable color (x, y) board then
         let nextBoard = place color (x, y) board
 
-        let nextColor =
-          if findPlacable (swap color) nextBoard |> Seq.isEmpty
-          then color
-          else swap color
-        Success
-          ({ hand = (x, y), color
-             nextColor = nextColor }), (nextBoard, InGame(nextColor))
+        if (findPlacable (swap color) nextBoard
+            |> Seq.isEmpty
+            && findPlacable color nextBoard |> Seq.isEmpty) then
+          // both player has no place to play
+          let winner = getWinner nextBoard
+          End
+            ({ hand = (x, y), color
+               win = winner }), (nextBoard, GameEnd(winner))
+        else
+          let nextColor =
+            if findPlacable (swap color) nextBoard |> Seq.isEmpty
+            then color
+            else swap color
+          Success
+            ({ hand = (x, y), color
+               nextColor = nextColor }), (nextBoard, InGame(nextColor))
       else
         Failed(InvalidPosition(x, y)), game
