@@ -1,16 +1,19 @@
-﻿// Learn more about F# at http://fsharp.org
+﻿open Reversi
 
-open System
-open Reversi
+let inline input f = System.Console.ReadLine() |> f
+let inline inputs f = System.Console.ReadLine().Split() |> Array.map f
+let getIntPairFromInput (): int * int = let nums = inputs int in (nums.[0], nums.[1])
 
 [<EntryPoint>]
 let main argv =
-  printfn "%A" (seq {for x in 0..7 do for y in 1..7 do yield (x,y)} |> Seq.filter (fun pos -> checkPlacable Black pos initBoard))
-  printfn "%b" (checkPlacable Black (1, 1) initBoard)
-  printfn "%b" (checkPlacable Black (2, 3) initBoard)
-  printfn "%b" (checkPlacable Black (3, 2) initBoard)
-  printfn "%b" (checkPlacable Black (3, 3) initBoard)
-  printfn "%s" (initBoard |> place Black (2, 3) |> formatBoard)
-  printfn "%s" (initBoard |> place Black (2, 3) |> place White (2, 2) |> formatBoard)
-  printfn "%s" (initGame |> play (2, 3) |> play(2, 2) |> formatGame)
+  initGame
+  |> Seq.unfold (fun game ->
+    match snd game with
+    | InGame(_) -> 
+      printfn "%s" (formatGame game)
+      let pos = getIntPairFromInput()
+      if fst pos = -1 && snd pos = -1 then None else
+      Some(play pos game)
+    | GameEnd(_) -> None
+  ) |> Seq.toList |> printfn "%A"
   0 // return an integer exit code
