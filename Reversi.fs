@@ -132,7 +132,8 @@ type GameStatus =
 let formatGameStatus gameStatus =
   match gameStatus with
   | InGame(color) -> sprintf "%s's turn (%s)" (color.ToString()) ((color2Char color).ToString())
-  | GameEnd(color) -> sprintf "Winner: %s" (color.ToString())
+  | GameEnd(Some(color)) -> sprintf "Winner: %s" (color.ToString())
+  | GameEnd(None) -> "Draw"
 
 type Game = Board * GameStatus
 
@@ -158,12 +159,11 @@ type TurnResult =
 
 let getMessage turnResult =
   match turnResult with
-  | End(fin) -> sprintf "%A: %A  Winner: %A" (snd fin.hand) (fst fin.hand) fin.win
+  | End({hand = hand; win = Some(win)}) -> sprintf "%A: %A  Winner: %A" (snd hand) (fst hand) win
+  | End({hand = hand; win = None}) -> sprintf "%A: %A  Draw" (snd hand) (fst hand)
   | Success(succ) -> sprintf "%A: %A  next: %A's turn" (snd succ.hand) (fst succ.hand) succ.nextColor
-  | Failed(failed) ->
-      match failed with
-      | InvalidPosition(x, y) -> sprintf "(%d, %d) is not valid place" x y
-      | GameIsOver -> "Game is Over!"
+  | Failed(InvalidPosition(x, y)) -> sprintf "(%d, %d) is not valid place" x y
+  | Failed(GameIsOver) -> "Game is Over!"
 
 let play (x, y) game =
   match game with

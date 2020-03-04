@@ -16,6 +16,9 @@ let main argv =
       let result = play pos game
       printfn "%s" (getMessage (fst result))
       Some(result)
-    | GameEnd(_) -> None
+    | GameEnd(_) -> 
+      printfn "Black: %d, White: %d" (count Black (fst game)) (count White (fst game))
+      printfn "%s" (formatGame game)
+      None
   ) |> Seq.toList |> printfn "%A"
   0 // return an integer exit code
