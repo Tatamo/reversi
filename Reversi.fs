@@ -138,6 +138,14 @@ type TurnResult =
   | Success of SuccessTurnResult
   | Failed of FailedTurnResult
 
+let getMessage turnResult =
+  match turnResult with
+  | End(fin) -> sprintf "%A: %A  Winner: %A" (snd fin.hand) (fst fin.hand) fin.win
+  | Success(succ) -> sprintf "%A: %A  next: %A's turn" (snd succ.hand) (fst succ.hand) succ.nextColor
+  | Failed(failed) ->
+    match failed with
+    | InvalidPosition(x,y) -> sprintf "(%d, %d) is not valid place" x y
+    | GameIsOver -> "Game is Over!"
 
 let play (x, y) game =
   match game with

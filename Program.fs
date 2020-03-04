@@ -13,7 +13,9 @@ let main argv =
       printfn "%s" (formatGame game)
       let pos = getIntPairFromInput()
       if fst pos = -1 && snd pos = -1 then None else
-      Some(play pos game)
+      let result = play pos game
+      printfn "%s" (getMessage (fst result))
+      Some(result)
     | GameEnd(_) -> None
   ) |> Seq.toList |> printfn "%A"
   0 // return an integer exit code
