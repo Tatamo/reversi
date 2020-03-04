@@ -9,6 +9,11 @@ let swap color =
   | Black -> White
   | White -> Black
 
+let color2Char color =
+  match color with
+  | Black -> 'x'
+  | White -> 'o'
+
 type Disk = Color option
 
 type Board = Disk [,]
@@ -92,20 +97,17 @@ let formatBoard (board: Board) =
     board
     |> Array2D.map (fun disk ->
          match disk with
-         | Some(color) ->
-             match color with
-             | Black -> 'x'
-             | White -> 'o'
+         | Some(color) -> color2Char color
          | None -> '.')
   seq {
     for y in 0 .. 7 do
-      yield seq {
-              for x in 0 .. 7 -> charArray2D.[x, y]
-            }
-            |> Seq.toArray
-            |> System.String
+      yield y.ToString() + (seq {
+                              for x in 0 .. 7 -> charArray2D.[x, y]
+                            }
+                            |> Seq.toArray
+                            |> System.String)
   }
-  |> Seq.fold (fun acc elm -> acc + "\n" + elm) ""
+  |> Seq.fold (fun acc elm -> acc + "\n" + elm) " 01234567"
 
 type GameStatus =
   | InGame of Color
@@ -113,7 +115,7 @@ type GameStatus =
 
 let formatGameStatus gameStatus =
   match gameStatus with
-  | InGame(color) -> sprintf "%s's turn" (color.ToString())
+  | InGame(color) -> sprintf "%s's turn (%s)" (color.ToString()) ((color2Char color).ToString())
   | GameEnd(color) -> sprintf "Winner: %s" (color.ToString())
 
 type Game = Board * GameStatus
@@ -143,9 +145,9 @@ let getMessage turnResult =
   | End(fin) -> sprintf "%A: %A  Winner: %A" (snd fin.hand) (fst fin.hand) fin.win
   | Success(succ) -> sprintf "%A: %A  next: %A's turn" (snd succ.hand) (fst succ.hand) succ.nextColor
   | Failed(failed) ->
-    match failed with
-    | InvalidPosition(x,y) -> sprintf "(%d, %d) is not valid place" x y
-    | GameIsOver -> "Game is Over!"
+      match failed with
+      | InvalidPosition(x, y) -> sprintf "(%d, %d) is not valid place" x y
+      | GameIsOver -> "Game is Over!"
 
 let play (x, y) game =
   match game with
@@ -158,6 +160,8 @@ let play (x, y) game =
           if findPlacable (swap color) nextBoard |> Seq.isEmpty
           then color
           else swap color
-        Success({ hand = (x, y), color; nextColor = nextColor }), (nextBoard, InGame(nextColor))
+        Success
+          ({ hand = (x, y), color
+             nextColor = nextColor }), (nextBoard, InGame(nextColor))
       else
         Failed(InvalidPosition(x, y)), game
