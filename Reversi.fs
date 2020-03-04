@@ -74,7 +74,7 @@ let checkPlacable color (x, y) (board: Board) =
 let findPlacable color board =
   seq {
     for x in 0 .. 7 do
-      for y in 1 .. 7 do
+      for y in 0 .. 7 do
         yield (x, y)
   }
   |> Seq.filter (fun pos -> checkPlacable color pos board)
